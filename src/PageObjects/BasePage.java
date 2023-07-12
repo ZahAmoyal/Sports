@@ -1,9 +1,11 @@
 package PageObjects;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.result.*;
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.openqa.selenium.By;
@@ -24,7 +26,7 @@ public class BasePage {
     public WebDriverWait wait;
     String password = "a72Y53vXKjhNDAJn";
     String userName = "shilo";
-    MongoClient mongoClient;
+    // MongoClient mongoClient;
     MongoDatabase db;
 
 
@@ -46,20 +48,42 @@ public class BasePage {
         System.out.println(this.db + " 1");
         System.out.println("Get database is successful");
         System.out.println(this.db + " 0B");
+
     }
 
-    public void mongoInsertData(String title, String summary, String paragraph, String category) {
+    public void mongoInsertData(String title, String summary, String paragraph, String imageLink, int count) {
 
-        MongoCollection<Document> collection = this.db.getCollection("geekTime");
+        MongoCollection<Document> collection = db.getCollection("Sport5");
         InsertOneResult result = collection.insertOne(new Document()
                 .append("_id", new ObjectId())
                 .append("num", count)
-                .append("author", "geekTime")
-                .append("category", category)
                 .append("title", title)
                 .append("summary", summary)
                 .append("paragraph", paragraph)
-                .append("imageLing", imageLink));
+                .append("imageLink", imageLink));
+    }
+
+    public void mongoUpdateData(String summary, String paragraph, String title, String count, int imageLink) {
+        BasicDBObject searchQuery = new BasicDBObject();
+        searchQuery.append("num", count);
+
+
+        BasicDBObject updateQuery = new BasicDBObject();
+        updateQuery.append("$set",
+                new BasicDBObject()//.append("date_time", date)
+                        .append("title", title)
+                        .append("summary", summary)
+                        .append("paragraph", paragraph)
+                        .append("imageLink", imageLink));
+        db.getCollection("ArticlesSportFive").updateOne(searchQuery, updateQuery);
+    }
+
+    public Boolean tableStatus(int i) {
+        MongoCollection<Document> collection = db.getCollection("chatNews2");
+        if (collection.countDocuments() < i) {
+            return false;
+        }
+        return true;
     }
 
     //one
@@ -171,6 +195,7 @@ public class BasePage {
     }
 
     public void SportFiveArticles(String url) throws InterruptedException {
+        createDb("ArticlesSportFive");
         driver.get(url);
         String handle = driver.getWindowHandle();
         WebElement article = driver.findElement(allArticlesSportFive);
@@ -190,8 +215,8 @@ public class BasePage {
                     .build()
                     .perform();
             handles();
-            String pageSource = driver.getPageSource();
-            System.out.println("Source -" + handle);
+            //String pageSource = driver.getPageSource();
+            //System.out.println("Source -" + handle);
             System.out.println("Target - " + driver.getWindowHandle());
             String title = driver.getTitle();
             System.out.println(title);
@@ -199,15 +224,15 @@ public class BasePage {
             if (driver.getTitle().contains("דקה אחר דקה")) {
                 dakaAharDake();
             } else {
-                getArticlesSportFive();
+                getArticlesSportFive(i + 1);
             }
             driver.close();
             driver.switchTo().window(handle);
         }
     }
 
-    public void getArticlesSportFive() {
-        createDb("ArticlesSportFive");
+    public void getArticlesSportFive(int countx) {
+
         By title = By.cssSelector("h1.article-main");
         By subTitle = By.cssSelector("h2.article-sub-main");
         By articleContent = By.cssSelector("div.article-content");
@@ -224,11 +249,16 @@ public class BasePage {
         for (WebElement story : storyList) {
             fullStory += story.getText() + '\n';
         }
-        mongoInsertData(title1, fullStory, subtitle1, image);
-        System.out.println("Title: " + title1);
-        System.out.println("Title: " + subtitle1);
-        System.out.println("summery: " + fullStory);
-        System.out.println("picLink: " + image);
+        if (!tableStatus(7)) {
+            mongoInsertData(title1, fullStory, subtitle1, image, countx);
+        } else {
+            mongoUpdateData(title1, fullStory, subtitle1, image, countx);
+            System.out.println("Title: " + title1);
+            System.out.println("Title: " + subtitle1);
+            System.out.println("summery: " + fullStory);
+            System.out.println("picLink: " + image);
+            System.out.println("num" + countx);
+        }
     }
 }
 
