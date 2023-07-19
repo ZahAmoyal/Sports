@@ -1,3 +1,4 @@
+/*
 package Tests;
 
 import org.junit.Test;
@@ -9,4 +10,4 @@ public class OneTests extends BaseTest {
     public void sportOneNews() {
         oneFlow.flowOne();
     }
-}
+}*/

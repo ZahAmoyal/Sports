@@ -5,7 +5,8 @@ import org.junit.Test;
 public class SportFiveTests extends BaseTest {
 
     @Test
-    public void sportFiveNews() throws InterruptedException {
+    public void sportNews() throws InterruptedException {
         sportFiveFlow.flowSportFive();
+        oneFlow.flowOne();
     }
 }

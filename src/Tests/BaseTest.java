@@ -44,8 +44,6 @@ public class BaseTest {
     }
 
 
-
-
     public static void setupBrowzer() {
         System.setProperty("webdriver.chrome.driver", "src/Data/chromedriver1.exe");
         ChromeOptions chromeOptions = new ChromeOptions();
