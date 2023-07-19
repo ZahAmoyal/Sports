@@ -3,23 +3,18 @@ import Flows.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class BaseTest {
 
     static WebDriver driver;
+
     static SportFiveFlow sportFiveFlow;
     static OneFlow oneFlow;
 
@@ -48,7 +43,7 @@ public class BaseTest {
         System.setProperty("webdriver.chrome.driver", "src/Data/chromedriver1.exe");
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--remote-allow-origins=*");
-        //options.addArguments("--headless");
+        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("disable-popup-blocking");
         driver = new ChromeDriver(chromeOptions);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(60000));
@@ -66,11 +61,11 @@ public class BaseTest {
     }
 
 
-    @AfterClass
-    public static void closeDriver() {
-        driver.close();
-        driver.quit();
-    }
+//    @AfterClass
+//    public static void closeDriver() {
+//        driver.close();
+//        driver.quit();
+//    }
 
    /* public void sportFive(String url){
         driver.get(url);
