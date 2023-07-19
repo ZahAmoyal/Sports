@@ -47,17 +47,17 @@ public class BaseTest {
 
 
     public static void setupBrowzer() {
-        System.setProperty("webdriver.chrome.driver", "src/Data/chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "src/Data/chromedriver1.exe");
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--remote-allow-origins=*");
         //options.addArguments("--headless");
         chromeOptions.addArguments("disable-popup-blocking");
         driver = new ChromeDriver(chromeOptions);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(60000));
         driver.manage().window().maximize();
     }
     public void waitVisibility(By by) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(1500));
         wait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 

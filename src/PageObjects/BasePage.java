@@ -8,10 +8,7 @@ import com.mongodb.client.result.*;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -28,6 +25,7 @@ public class BasePage {
     String userName = "shilo";
     // MongoClient mongoClient;
     MongoDatabase db;
+    //static String fullStory;
 
 
     public void createDb(String dbTableName) {
@@ -51,9 +49,9 @@ public class BasePage {
 
     }
 
-    public void mongoInsertData(String title, String summary, String paragraph, String imageLink, int count) {
+    public void mongoInsertData(String title, String summary, String paragraph, String imageLink, int count, String name) {
 
-        MongoCollection<Document> collection = db.getCollection("Sport5");
+        MongoCollection<Document> collection = db.getCollection(name);
         InsertOneResult result = collection.insertOne(new Document()
                 .append("_id", new ObjectId())
                 .append("num", count)
@@ -63,7 +61,7 @@ public class BasePage {
                 .append("imageLink", imageLink));
     }
 
-    public void mongoUpdateData(String summary, String paragraph, String title, String count, int imageLink) {
+    public void mongoUpdateData(String summary, String paragraph, String title, String count, int imageLink, String name) {
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.append("num", count);
 
@@ -75,7 +73,7 @@ public class BasePage {
                         .append("summary", summary)
                         .append("paragraph", paragraph)
                         .append("imageLink", imageLink));
-        db.getCollection("ArticlesSportFive").updateOne(searchQuery, updateQuery);
+        db.getCollection(name).updateOne(searchQuery, updateQuery);
     }
 
     public Boolean tableStatus(int i) {
@@ -95,7 +93,7 @@ public class BasePage {
     //Resetting the page
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(6000000));
     }
 
     //Get Text
@@ -106,7 +104,7 @@ public class BasePage {
 
     // A function for waiting for an element's visibility
     public void waitVisibility(By by) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(6000000));
         try {
             Thread.sleep(1500);
         } catch (InterruptedException e) {
@@ -135,7 +133,7 @@ public class BasePage {
 
     public void dakaAharDake() {
         waitVisibility(By.cssSelector("div.main-block div.table_cont_daka"));
-        By allArticle = By.cssSelector("div.main-block div.table_cont_daka");
+        /*By allArticle = By.cssSelector("div.main-block div.table_cont_daka");
         WebElement elementAllArticles = driver.findElement(allArticle);
         List<WebElement> articlesDaD = elementAllArticles.findElements(By.tagName("tr"));
         for (int i = 0; i < articlesDaD.size(); i++) {
@@ -143,7 +141,7 @@ public class BasePage {
             WebElement time_Date = driver.findElement(By.className(articlesDaD.get(i).getAttribute("class")));
             System.out.println(time_Date.findElement(By.cssSelector("div.first")).getText());
             String pic = articlesDaD.get(i).getAttribute("src");
-            System.out.println(pic);
+            System.out.println(pic);*/
             /*//articlesDaD.get(i).By.cssSelector("td.tblRtColumn"));
             System.out.println(time.get(i).getText());
             List<WebElement>iframes = elementAllArticles.findElements(By.tagName("iframe"));
@@ -157,9 +155,10 @@ public class BasePage {
             List<WebElement>pic1 = pic.findElements(By.tagName("a"));
             System.out.println(pic1.get(i).getAttribute("href"));*/
         }
-    }
+
 
     public void oneArticles(String url) {
+        createDb("GQ-Dashboard");
         driver.get(url);
         WebElement web = driver.findElement(allArticlesOne);
         List<WebElement> articles = web.findElements(By.tagName("a"));
@@ -170,95 +169,137 @@ public class BasePage {
             WebElement webb = driver.findElement(allArticlesOne);
             List<WebElement> articlesb = webb.findElements(By.tagName("a"));
             articlesb.get(i).click();
-            getArticlesOne();
+            getArticlesOne(i + 1);
             driver.navigate().back();
         }
     }
 
-    public void getArticlesOne() {
+    public void getArticlesOne(int countx) {
+        String fullStory=null;
         By story = By.cssSelector("div.article-center-column");
+        waitVisibility(story);
         WebElement elementStory = driver.findElement(story);
         By articleContent = By.cssSelector("[itemprop=articleBody]");
+        waitVisibility(articleContent);
         WebElement element = driver.findElement(articleContent);
         List<WebElement> date_timeList = driver.findElements(By.cssSelector(".article-body-container .article-credit time"));
         List<WebElement> articleContentList = element.findElements(By.tagName("p"));
         List<WebElement> picList = elementStory.findElements(By.tagName("img"));
-        List<WebElement> title = elementStory.findElements(By.tagName("header"));
-        for (int i = 0; i < title.size(); i++) {
-            System.out.println(title.get(i).getText());
-        }
+        String title1 = elementStory.findElement(By.tagName("h1")).getText();
+        String subtitle1 = elementStory.findElement(By.tagName("h2")).getText();
+        System.out.println(title1);
+        System.out.println(subtitle1);
         System.out.println(date_timeList.get(0).getText());
-        System.out.println(picList.get(6).getAttribute("src"));
+        String imagePath = picList.get(6).getAttribute("src");
+        System.out.println(imagePath);
         for (int i = 0; i < articleContentList.size(); i++) {
+            fullStory += articleContentList.get(i).getText() + '\n';
             System.out.println(articleContentList.get(i).getText());
         }
+        if (!tableStatus(articleContentList.size())) {
+            mongoInsertData(title1, fullStory, subtitle1, imagePath, countx, "One");
+        } else {
+            mongoUpdateData(title1, fullStory, subtitle1, imagePath, countx, "One");
+            System.out.println("Title: " + title1);
+            System.out.println("SubTitle: " + subtitle1);
+            System.out.println("summery: " + fullStory);
+            System.out.println("picLink: " + imagePath);
+            System.out.println("num" + countx);
+        }
+
     }
 
     public void SportFiveArticles(String url) throws InterruptedException {
-        createDb("ArticlesSportFive");
+        createDb("GQ-Dashboard");
         driver.get(url);
         String handle = driver.getWindowHandle();
         WebElement article = driver.findElement(allArticlesSportFive);
-        List<WebElement> allArticle = article.findElements(By.cssSelector("div.section.section-.color-alt-"));
-        System.out.println(allArticle.size() + " size");
-        for (int i = 0; i < allArticle.size() - 1; i++) {
+        List<WebElement> articles = article.findElements(By.cssSelector("div.section.section-.color-alt- h2 a"));
+        System.out.println(articles.size() + " size");
+        for (int i = 0; i < articles.size(); i++) {
             System.out.println("-------------------------------");
             System.out.println("Sport5");
-            WebElement article1 = driver.findElement(allArticlesSportFive);
-            List<WebElement> articles = article1.findElements(By.cssSelector("div.section.section-.color-alt-"));
+        /*    WebElement article1 = driver.findElement(allArticlesSportFive);
+            List<WebElement> articles = article1.findElements(By.cssSelector("div.section.section-.color-alt- h2"));*/
             System.out.println(i + " III");
-            Thread.sleep(1000);
-            Actions actions = new Actions(driver);
-            actions.keyDown(Keys.LEFT_CONTROL)
-                    .click(articles.get(i))
-                    .keyUp(Keys.LEFT_CONTROL)
-                    .build()
-                    .perform();
+            System.out.println(articles.get(i).getText());
+            System.out.println(articles.size());
+            Thread.sleep(3000);
+    /*        Actions actions = new Actions(driver);
+            actions.keyDown(Keys.LEFT_CONTROL).
+                    click(articles.get(i)).
+                    keyUp(Keys.LEFT_CONTROL).
+                    build().perform();*/
+            String urlNew = articles.get(i).getAttribute("href");
+            System.out.println("urlNew "+urlNew);
+            ((JavascriptExecutor) driver).executeScript("window.open(arguments[0])", urlNew);
             handles();
-            //String pageSource = driver.getPageSource();
-            //System.out.println("Source -" + handle);
             System.out.println("Target - " + driver.getWindowHandle());
             String title = driver.getTitle();
-            System.out.println(title);
+            //System.out.println(title);
             System.out.println(title.contains("דקה אחר דקה"));
-            if (driver.getTitle().contains("דקה אחר דקה")) {
-                dakaAharDake();
-            } else {
+            if (!driver.getTitle().contains("דקה אחר דקה"))
+                //dakaAharDake();
                 getArticlesSportFive(i + 1);
-            }
+            /*else {
+                getArticlesSportFive(i + 1);
+            }*/
             driver.close();
             driver.switchTo().window(handle);
+            article = driver.findElement(allArticlesSportFive);
+             articles = article.findElements(By.cssSelector("div.section.section-.color-alt- h2 a"));
+            System.out.println(articles.get(i).getAttribute("href"));
         }
     }
 
     public void getArticlesSportFive(int countx) {
-
-        By title = By.cssSelector("h1.article-main");
-        By subTitle = By.cssSelector("h2.article-sub-main");
+        String title = getTitle();
+        String subTitle = getSubTitle();
         By articleContent = By.cssSelector("div.article-content");
         By picture = By.cssSelector("div.content-holder");
         WebElement pictureElement = driver.findElement(picture);
         WebElement elementArticleContent = driver.findElement(articleContent);
-        String title1 = getText(title);
-        String subtitle1 = getText(subTitle);
         List<WebElement> pic = pictureElement.findElements(By.tagName("img"));
-        System.out.println(pic.size());
-        String image = (pic.get(0).getAttribute("src"));
+        String image =getImagePath(pic);
+        //System.out.println(pic.size());
+
+        //String image = (pic.get(0).getAttribute("src"));
         List<WebElement> storyList = elementArticleContent.findElements(By.tagName("p"));
-        String fullStory = null;
-        for (WebElement story : storyList) {
+        String fullStory = getStory(storyList);
+/*        for (WebElement story : storyList) {
             fullStory += story.getText() + '\n';
-        }
-        if (!tableStatus(7)) {
-            mongoInsertData(title1, fullStory, subtitle1, image, countx);
+        }*/
+        if (!tableStatus(storyList.size())) {
+            mongoInsertData(title, fullStory, subTitle, image, countx, "sport5");
         } else {
-            mongoUpdateData(title1, fullStory, subtitle1, image, countx);
-            System.out.println("Title: " + title1);
-            System.out.println("Title: " + subtitle1);
+            mongoUpdateData(title, fullStory, subTitle, image, countx, "sport5");
+            System.out.println("Title: " + title);
+            System.out.println("SubTitle: " + subTitle);
             System.out.println("summery: " + fullStory);
             System.out.println("picLink: " + image);
             System.out.println("num" + countx);
         }
     }
+
+    public String getTitle() {
+        By title = By.cssSelector("h1.article-main");
+        return getText(title);
+    }
+
+    public String getSubTitle() {
+        By subTitle = By.cssSelector("h2.article-sub-main");
+        return getText(subTitle);
+    }
+    public String getStory(List<WebElement>storyList){
+        String fullStory1 = null;
+        for (WebElement story : storyList) {
+            fullStory1 += story.getText() + '\n';
+        }
+        return fullStory1;
+    }
+    public String getImagePath(List<WebElement>pic){
+        return pic.get(1).getAttribute("src");
+    }
 }
+
 
