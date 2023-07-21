@@ -10,7 +10,7 @@ public class OneIsraeli extends BasePage {
     }
 
     public void sportOneIsraeli() {
-        oneArticles("https://www.one.co.il/Soccer/News/1");
+        oneArticles("https://www.one.co.il/Soccer/News/1",10);
     }
 
 

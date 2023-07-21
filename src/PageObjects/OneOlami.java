@@ -10,7 +10,7 @@ public class OneOlami extends BasePage{
     }
 
     public void sportOneOlami() {
-        oneArticles("https://www.one.co.il/Soccer/News/3");
+        oneArticles("https://www.one.co.il/Soccer/News/3",15);
     }
 
 

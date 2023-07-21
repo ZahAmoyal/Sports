@@ -66,7 +66,7 @@ public class BasePage {
                 .append("video", video));
     }
 
-    public void mongoUpdateData(int count, String author, String title, String subTitle, String summary, String time, String date, String image, String video) {
+    public void mongoUpdateData(int count, String author, String title, String subtitle, String summary, String time, String date, String image, String video) {
         String name = "sportnews";
         BasicDBObject searchQuery = new BasicDBObject();
         searchQuery.append("num", count);
@@ -75,8 +75,9 @@ public class BasePage {
         BasicDBObject updateQuery = new BasicDBObject();
         updateQuery.append("$set",
                 new BasicDBObject()
+                        .append("author", author)
                         .append("title", title)
-                        .append("subTitle", subTitle)
+                        .append("subtitle", subtitle)
                         .append("summary", summary)
                         .append("time", time)
                         .append("date", date)
@@ -168,23 +169,25 @@ public class BasePage {
     }
 
 
-    public void oneArticles(String url) {
+    public void oneArticles(String url,int check) {
         createDb("GQ-Dashboard");
         driver.get(url);
         WebElement web = driver.findElement(allArticlesOne);
         List<WebElement> articles = web.findElements(By.tagName("a"));
         System.out.println(articles.size() + " size");
         for (int i = 0; i < 5; i++) {
+            check++;
             System.out.println("-------------------------------");
             System.out.println("One");
+            System.out.println(check);
             WebElement webb = driver.findElement(allArticlesOne);
             List<WebElement> articlesb = webb.findElements(By.tagName("a"));
             articlesb.get(i).click();
             //if (check(check1) == false) {
-            getArticlesOne(i + 1);
+            getArticlesOne(check);
             // driver.navigate().back();
 
-            //  } else {
+            //  } else {6.9
             driver.navigate().back();
             // }
         }
@@ -201,8 +204,8 @@ public class BasePage {
         WebElement element = driver.findElement(articleContent);
         By time_date = By.cssSelector(".article-body-container .article-credit time");
         String[] arr = getText(time_date).split(" ");
-        String time = arr[0];
-        String date = arr[1];
+        String time = arr[1];
+        String date = arr[0];
         List<WebElement> articleContentList = element.findElements(By.tagName("p"));
         List<WebElement> picList = elementStory.findElements(By.tagName("img"));
         String title = elementStory.findElement(By.tagName("h1")).getText();
@@ -218,19 +221,20 @@ public class BasePage {
             System.out.println(articleContentList.get(i).getText());
         }
         fullStory = fullStory.replace("null", "");
- /*       if (!tableStatus(articleContentList.size())) {
-            mongoInsertData(countx,author , title, fullStory, subtitle, time, date, image, video);
-        } else {*/
-        mongoUpdateData(countx, author, title, fullStory, subtitle, time, date, image, video);
-        System.out.println("author: " + author);
-        System.out.println("Title: " + title);
-        System.out.println("SubTitle: " + subtitle);
-        System.out.println("summery: " + fullStory);
-        System.out.println("time: " + time);
-        System.out.println("date: " + date);
-        System.out.println("image: " + image);
-        System.out.println("num" + countx);
-        System.out.println("video: " + video);
+        if (!tableStatus(articleContentList.size())) {
+            mongoInsertData(countx, author, title, fullStory, subtitle, time, date, image, video);
+        } else {
+            mongoUpdateData(countx, author, title, fullStory, subtitle, time, date, image, video);
+            System.out.println("num" + countx);
+            System.out.println("author: " + author);
+            System.out.println("Title: " + title);
+            System.out.println("SubTitle: " + subtitle);
+            System.out.println("summery: " + fullStory);
+            System.out.println("time: " + time);
+            System.out.println("date: " + date);
+            System.out.println("image: " + image);
+            System.out.println("video: " + video);
+        }
     }
 
 
@@ -246,7 +250,7 @@ public class BasePage {
         return false;
     }
 
-    public void SportFiveArticles(String url) throws InterruptedException {
+    public void SportFiveArticles(String url,int zah) throws InterruptedException {
         createDb("GQ-Dashboard");
         driver.get(url);
         String handle = driver.getWindowHandle();
@@ -254,8 +258,10 @@ public class BasePage {
         List<WebElement> articles = article.findElements(By.cssSelector("div.section.section-.color-alt- h2 a"));
         System.out.println(articles.size() + " size");
         for (int i = 0; i < 5; i++) {
+            zah++;
             System.out.println("-------------------------------");
             System.out.println("Sport5");
+            System.out.println(zah);
         /*    WebElement article1 = driver.findElement(allArticlesSportFive);
             List<WebElement> articles = article1.findElements(By.cssSelector("div.section.section-.color-alt- h2"));*/
             System.out.println(i + " III");
@@ -277,7 +283,7 @@ public class BasePage {
             System.out.println(title.contains("דקה אחר דקה"));
             if (!driver.getTitle().contains("דקה אחר דקה"))
                 //dakaAharDake();
-                getArticlesSportFive(i + 1);
+                getArticlesSportFive(zah);
             /*else {
                 getArticlesSportFive(i + 1);
             }*/
@@ -287,13 +293,14 @@ public class BasePage {
             articles = article.findElements(By.cssSelector("div.section.section-.color-alt- h2 a"));
             System.out.println(articles.get(i).getAttribute("href"));
         }
+        zah = zah+5;
     }
 
     public void getArticlesSportFive(int countx) {
         String author = "Sport5";
         By time_date = By.cssSelector("span.hint");
         String[] arr = getText(time_date).split(" ");
-        String time= arr[4].substring(0,5);
+        String time = arr[4].substring(0, 5);
         System.out.println(time);
         String date = arr[2];
         String title = getTitle();
@@ -313,19 +320,20 @@ public class BasePage {
             fullStory += story.getText() + '\n';
         }*/
         fullStory = fullStory.replace("null", "");
-        // if (!tableStatus(storyList.size())) {
-        //   mongoInsertData(countx,author, title, subTitle, fullStory, time, date, image, video);
-        //} else {
-        mongoUpdateData(countx, author, title, subTitle, fullStory, time, date, image, video);
-        System.out.println("author: " + author);
-        System.out.println("Title: " + title);
-        System.out.println("SubTitle: " + subTitle);
-        System.out.println("summery: " + fullStory);
-        System.out.println("time:" + time);
-        System.out.println("date:" + date);
-        System.out.println("picLink: " + image);
-        System.out.println("num" + countx);
-        System.out.println("video: " + video);
+        if (!tableStatus(storyList.size())) {
+            mongoInsertData(countx, author, title, subTitle, fullStory, time, date, image, video);
+        } else {
+            mongoUpdateData(countx, author, title, subTitle, fullStory, time, date, image, video);
+            System.out.println("num" + countx);
+            System.out.println("author: " + author);
+            System.out.println("Title: " + title);
+            System.out.println("SubTitle: " + subTitle);
+            System.out.println("summery: " + fullStory);
+            System.out.println("time:" + time);
+            System.out.println("date:" + date);
+            System.out.println("picLink: " + image);
+            System.out.println("video: " + video);
+        }
     }
 
 
