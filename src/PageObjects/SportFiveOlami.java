@@ -11,6 +11,6 @@ public class SportFiveOlami extends BasePage {
     }
 
     public void sportFiveOlami() throws InterruptedException {
-        SportFiveArticles(urlOlamiSportFive,6);
+        SportFiveArticles(urlOlamiSportFive,5);
     }
 }
